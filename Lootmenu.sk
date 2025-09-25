@@ -1,0 +1,77 @@
+# Loot GUI command, This project is used to teach me:
+# 1. GUI's, Safety Precautions within them, and custom item names alongside interactions
+# 2. Variables connected to players
+# 3. Purchases via connections with Vault
+# 4. RNG, and specified responses
+command /lootmenu:
+    trigger:
+        # Open a 3-row chest GUI named "Loot Menu"
+        open chest inventory with 3 rows named "&6Loot Menu" to player
+
+        # Button's to GUI
+        set slot 11 of player's current inventory to gold_ingot named "&aBuy Loot"
+        set slot 13 of player's current inventory to chest named "&bOpen Loot"
+        set slot 15 of player's current inventory to barrier named "&cClose Menu"
+            # Detect click, and cancel event to prevent GUI items being taken out
+on inventory click:
+    if name of event-inventory is "&6Loot Menu":
+        cancel event
+        # Detect open loot button
+    if the clicked slot is a chest named "&bOpen Loot":
+    # Detect if they own a "crate"
+        if {bought::%player%} >= 1:
+        # if so, remove 1 from amount owned
+            subtract 1 from {bought::%player%}
+            # roll probability
+            set {_roll} to random integer between 1 and 100
+            
+
+        # 40% chance: Diamond
+            if {_roll} <= 40:
+                give player 1 diamond
+                send "&bYou found a Diamond! (40%%)" to player
+
+        # 25% chance: Iron Sword
+            else if {_roll} <= 65:
+                give player 1 iron_sword
+                send "&7You found an Iron Sword! (25%%)" to player
+
+        # 15% chance: Golden Apple
+            else if {_roll} <= 80:
+                give player 1 golden_apple
+                send "&6You found a Golden Apple! (15%%)" to player
+
+        # 10% chance: Bow
+            else if {_roll} <= 90:
+                give player 1 bow
+                send "&aYou found a Bow! (10%%)" to player
+
+        # 5% chance: Enchanted Golden Apple
+            else if {_roll} <= 95:
+                give player 1 enchanted_golden_apple
+                send "&dYou found an Enchanted Golden Apple! (5%%)" to player
+
+        # 5% chance: Netherite Sword
+            else:
+                give player 1 netherite_sword
+                send "&cYou found a Netherite Sword! (5%%)" to player
+        else:
+        # "Else" implies that you did not have a score higher than 1, meaning you owned 0 "crates"
+            send "&cYou do not have any loot crates!" to player
+
+    # Close button
+
+    if the clicked slot is a barrier named "&cClose Menu":
+        close player's inventory
+# Buying "Crate"
+    if the clicked slot is a gold_ingot named "&aBuy Loot":
+    # Set cost variable
+        set {_cost} to 100
+# If the players amount of money is higher than the cost, remove the cost from the player's money
+        if player's balance >= {_cost}:
+            remove {_cost} from player's balance
+# add 1 crate
+            add 1 to {bought::%player%}
+            send "&a Purchase successful! You now own %{bought::%player%}% loot crates!" to player
+        else:
+            send "&cYou can't afford this! (Price: %{_cost}%)" to player

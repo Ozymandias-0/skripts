@@ -1,0 +1,44 @@
+# Learning Attribute Applications within GUI, using formulas for exponential growth, and permissions
+command /attributemenu:
+    trigger:
+        if player has permission "skript.attribute":
+            send "Test Worked! You have perms!"
+            open chest inventory with 4 rows named "&aAttribute Menu" to player
+            set slot 1 of player's current inventory to golden_sword named "&c+20%% Atk Damage"
+            set slot 2 of player's current inventory to golden_boots named "&b+20%% Movement Speed"
+            set slot 3 of player's current inventory to golden_apple named "&c+20%% Max Health"
+            set slot 35 of player's current inventory to barrier named "&c&lReset attributes"
+        else:
+            send "You do not have perms!"
+on inventory click:
+    if name of event-inventory is "&aAttribute Menu":
+        cancel event
+    if the clicked slot is a golden_sword named "&c+20%% Atk Damage":
+        set {_base} to generic attack damage attribute of player
+        set {_bonus} to {_base} * 0.2
+        set generic attack damage attribute of player to {_base} + {_bonus}
+        send "&cYour attack_damage attribute has increased by 20%% until death!" to player
+    if the clicked slot is a golden_boots named "&b+20%% Movement Speed":
+        set {_base} to generic movement speed attribute of player
+        set {_bonus} to {_base} * 0.2
+        set generic movement speed attribute of player to {_base} + {_bonus}
+        send "&bYour movement_speed attribute has increased by 20%% until death!" to player
+    if the clicked slot is a golden_apple named "&c+20%% Max Health":
+        set {_base} to generic max health attribute of player
+        set {_bonus} to {_base} * 0.2
+        set generic max health attribute of player to {_base} + {_bonus}
+        send "&bYour max_health attribute has increased by 20%% until death!" to player
+    if the clicked slot is a barrier named "&c&lReset attributes":
+        set attack damage attribute of player to 1
+        reset max health attribute of player
+        set movement speed attribute of player to 0.10000000149011612
+        reset armor attribute of player
+        reset attack speed attribute of player
+        send "&bYou have chose to reset your attributes." to player
+on death of player:
+    set attack damage attribute of victim to 1
+    reset max health attribute of victim
+    set movement speed attribute of victim to 0.10000000149011612
+    reset armor attribute of victim
+    reset attack speed attribute of victim
+    send "&7Your attributes have been reset since you have passed." to victim

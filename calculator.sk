@@ -1,0 +1,65 @@
+# This project taught me a few things:
+# 1. Variables must be declared each time they are used in different sections
+# 2. How to properly define and call upon a function
+# 3. Detecting specific inventory clicks
+# 4. Detecting slot ID's instead of Item names
+command /calc:
+    trigger:
+        set {calc::%player's uuid%::n1} to 0
+        set {calc::%player's uuid%::n2} to 0
+        set {calc::%player's uuid%::type} to "+"
+        open chest inventory with 3 rows named "&aCalculator" to player
+        updateCalcGUI(player)
+
+function updateCalcGUI(p: player):
+    set {_uuid} to "%{_p}'s uuid%"
+    set {_n1} to {calc::%{_p}'s uuid%::n1}
+    set {_n2} to {calc::%{_p}'s uuid%::n2}
+    set {_t} to {calc::%{_p}'s uuid%::type}
+    if {calc::%{_uuid}%::type} = "+":
+        set {_eq} to {_n1} + {_n2}
+    if {calc::%{_uuid}%::type} = "-":
+        set {_eq} to {_n1} - {_n2}
+    if {calc::%{_uuid}%::type} = "*":
+        set {_eq} to {_n1} * {_n2}
+    if {calc::%{_uuid}%::type} = "/":
+        set {_eq} to {_n1} / {_n2}
+    set slot 11 of {_p}'s current inventory to paper named "&eN1: %{_n1}%" with lore "&aLC: +1, RC: -1, Shift: 5, This is N1"
+    set slot 13 of {_p}'s current inventory to paper named "&eType: %{_t}%" with lore "&7Click me to change"
+    set slot 15 of {_p}'s current inventory to paper named "&eN2: %{_n2}%" with lore "&aLC: +1, RC: -1, Shift: 5, This is N2"
+    set slot 26 of {_p}'s current inventory to lime concrete named "&a=" with lore "&f%{_eq}%"
+
+on inventory click:
+    if name of event-inventory is "&aCalculator":
+        cancel event
+        set {_uuid} to "%player's uuid%"
+        if clicked slot is 11:
+            if click action is lmb:
+                add 1 to {calc::%{_uuid}%::n1}
+            if click action is rmb:
+                remove 1 from {calc::%{_uuid}%::n1}
+            if click action is shift+lmb:
+                add 5 to {calc::%{_uuid}%::n1}
+            if click action is shift+rmb:
+                remove 5 from {calc::%{_uuid}%::n1}
+            updateCalcGUI(player)
+        if clicked slot is 15:
+            if click action is left mouse button:
+                add 1 to {calc::%{_uuid}%::n2}
+            if click action is right mouse button:
+                remove 1 from {calc::%{_uuid}%::n2}
+            if click action is shift+lmb:
+                add 5 to {calc::%{_uuid}%::n2}
+            if click action is shift+rmb:
+                remove 5 from {calc::%{_uuid}%::n2}
+            updateCalcGUI(player)
+        if clicked slot is 13:
+            if {calc::%{_uuid}%::type} = "+":
+                set {calc::%{_uuid}%::type} to "-"
+            else if {calc::%{_uuid}%::type} = "-":
+                set {calc::%{_uuid}%::type} to "*"
+            else if {calc::%{_uuid}%::type} = "*":
+                set {calc::%{_uuid}%::type} to "/"
+            else:
+                set {calc::%{_uuid}%::type} to "+"
+            updateCalcGUI(player)
